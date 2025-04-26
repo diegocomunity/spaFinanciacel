@@ -8,6 +8,17 @@ const API_BASE_URL = 'http://localhost:8000/api';
 const simulateApiDelay = (ms = 800) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Mock data
+
+// Mock data
+const mockClients = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Jane Smith" }
+];
+
+const mockPhones = [
+  { id: 1, model: "iPhone 15", price: 999.99 },
+  { id: 2, model: "Samsung Galaxy S24", price: 899.99 }
+];
 const mockApplications: Application[] = [
   {
     id: 1,
@@ -29,6 +40,22 @@ const mockInstallments: Record<number, Installment[]> = {
     status: i === 0 ? 'Paid' : i < 3 ? 'Upcoming' : 'Scheduled'
   }))
 };
+
+export const getClients = async () => {
+  //await simulateApiDelay();
+  const clients = await axios.get(`${API_BASE_URL}/clients`);
+  console.log(`Los clientes obtenidos de la api son: ${clients.data} ============`);
+  return clients.data;
+};
+
+export const getPhones = async () => {
+  //await simulateApiDelay();
+  //return mockPhones;
+
+  const phones = await axios.get(`${API_BASE_URL}/phones`);
+  return phones.data;
+};
+
 
 export const submitCreditApplication = async (data: CreditApplicationRequest): Promise<Application> => {
   try {

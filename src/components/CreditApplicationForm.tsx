@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { submitCreditApplication } from '../services/api';
+import { useQuery } from 'react-query';
+import { submitCreditApplication, getClients, getPhones } from '../services/api';
 import { AlertMessage } from './ui/AlertMessage';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -15,6 +17,12 @@ export const CreditApplicationForm: React.FC = () => {
     type: null,
     message: ''
   });
+
+  //agregar los query de clients y phones
+  
+  const { data: clients, isLoading: isLoadingClients } = useQuery('clients', getClients);
+  const { data: phones, isLoading: isLoadingPhones } = useQuery('phones', getPhones);
+
 
   const termOptions = Array.from({ length: 36 }, (_, i) => ({
     value: String(i + 1),
@@ -44,7 +52,7 @@ export const CreditApplicationForm: React.FC = () => {
       
       setAlert({
         type: 'success',
-        message: `Application submitted successfully! Application ID: ${response.id}`
+        message: `Se ha hecho la aplicaciòn al crédito éxitosamente`
       });
       
       // Reset form after successful submission
@@ -73,7 +81,51 @@ export const CreditApplicationForm: React.FC = () => {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <Input
+            {/**start select de usuario */}
+            <Select
+              id="clientId"
+              label="Client"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              options={clients?.map(client => ({
+                value: String(client.id),
+                label: client.name
+              })) || []}
+              placeholder="Seleccione el cliente"
+              required
+              disabled={isLoadingClients}
+            />
+            {/**end select de usuario */}
+
+            {
+              /**
+               * start select de phone
+               */
+            }
+            <Select
+              id="phoneId"
+              label="Phone Model"
+              value={phoneId}
+              onChange={(e) => setPhoneId(e.target.value)}
+              options={phones?.map(phone => ({
+                value: String(phone.id),
+                label: `${phone.model} - ${new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'COP'
+                }).format(phone.price)}`
+              })) || []}
+              placeholder="Seleccione el modelo"
+              required
+              disabled={isLoadingPhones}
+            />
+            {
+              /**
+               * end select del phone
+               */
+            }
+            {
+              /**
+               *             <Input
               id="clientId"
               label="Client ID"
               type="number"
@@ -84,8 +136,14 @@ export const CreditApplicationForm: React.FC = () => {
               min="1"
               icon={<CreditCard className="w-5 h-5 text-gray-400" />}
             />
+               * 
+               */
+            }
+
             
-            <Input
+            {
+              /**
+               *             <Input
               id="phoneId"
               label="Phone ID"
               type="number"
@@ -95,6 +153,8 @@ export const CreditApplicationForm: React.FC = () => {
               required
               min="1"
             />
+               */
+            }
             
             <Select
               id="termMonths"
